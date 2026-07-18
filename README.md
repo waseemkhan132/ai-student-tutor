@@ -56,9 +56,9 @@ npm run preview
 ```
 
 ## Screenshots
-![Home Page](./public/home.png)
-![Study Material](./public/study.png)
-![Quiz & Flashcards](./public/quiz.png)
+![Home Page](./public/SS1_APP.jpeg)
+![Study Material](./public/SS2_APP.jpeg)
+![Quiz & Flashcards](./public/SS3_APP.jpeg)
 
 ## Deploy on Vercel
 
