@@ -56,7 +56,7 @@ npm run preview
 ```
 
 ## Screenshots
-![Home Page](./public/SS1_APP.jpeg)
+![Home Page](./public/SS_APP.jpeg)
 ![Study Material](./public/SS2_APP.jpeg)
 ![Quiz & Flashcards](./public/SS3_APP.jpeg)
 
