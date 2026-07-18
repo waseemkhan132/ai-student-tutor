@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root { color-scheme: light dark; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  ::selection { @apply bg-brand-200 text-brand-900; }
+}
+
+@layer components {
+  .glass { @apply bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-white/40 dark:border-white/10; }
+  .card { @apply rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:opacity-50 disabled:pointer-events-none; }
+  .btn-primary { @apply btn bg-gradient-to-r from-brand-600 to-brand-500 text-white shadow-soft hover:from-brand-700 hover:to-brand-600 hover:-translate-y-0.5; }
+  .btn-ghost { @apply btn bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700; }
+  .btn-outline { @apply btn border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-brand-400 hover:text-brand-600 dark:hover:text-brand-400; }
+  .input { @apply w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/40 focus:border-brand-400 transition; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-brand-100 hover:text-brand-700 dark:hover:bg-brand-900/40 dark:hover:text-brand-300 cursor-pointer transition; }
+}
+
+.prose-tutor { @apply leading-relaxed text-slate-700 dark:text-slate-200; }
+.prose-tutor h1 { @apply text-2xl font-bold mt-6 mb-3 text-slate-900 dark:text-white; }
+.prose-tutor h2 { @apply text-xl font-bold mt-5 mb-2 text-slate-900 dark:text-white; }
+.prose-tutor h3 { @apply text-lg font-semibold mt-4 mb-2 text-slate-900 dark:text-white; }
+.prose-tutor p { @apply my-3; }
+.prose-tutor ul { @apply list-disc pl-6 my-3 space-y-1; }
+.prose-tutor ol { @apply list-decimal pl-6 my-3 space-y-1; }
+.prose-tutor a { @apply text-brand-600 dark:text-brand-400 underline; }
+.prose-tutor code { @apply rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-sm font-mono text-brand-700 dark:text-brand-300; }
+.prose-tutor pre { @apply rounded-xl bg-slate-900 dark:bg-slate-800 p-4 overflow-x-auto my-4 text-sm; }
+.prose-tutor pre code { @apply bg-transparent text-slate-100 p-0; }
+.prose-tutor table { @apply w-full my-4 border-collapse text-sm; }
+.prose-tutor th { @apply border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-left font-semibold; }
+.prose-tutor td { @apply border border-slate-200 dark:border-slate-700 px-3 py-2; }
+.prose-tutor blockquote { @apply border-l-4 border-brand-400 pl-4 italic text-slate-600 dark:text-slate-300 my-4; }
+
+.skeleton {
+  @apply rounded-md bg-slate-200/70 dark:bg-slate-800/70;
+  background-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  background-size: 1000px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { @apply bg-slate-300 dark:bg-slate-700 rounded-full; }
+::-webkit-scrollbar-thumb:hover { @apply bg-slate-400 dark:bg-slate-600; }
