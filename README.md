@@ -1,4 +1,7 @@
-# AI Student Tutor
+## https://ai-student-tutor-eosin.vercel.app
+
+
+ # AI Student Tutor
 
 Understand any topic in seconds with AI. An AI-powered study assistant that generates explanations, notes, flashcards, and quizzes using Google Gemini.
 
