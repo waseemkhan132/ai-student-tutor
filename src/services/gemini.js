@@ -1,7 +1,7 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
-
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const MODEL_NAME = 'gemini-flash-latest'
+const API_URL =
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
+const MODEL_NAME = 'gemini-1.5-flash'
 
 class GeminiError extends Error {
   constructor(message, status) {
@@ -11,43 +11,59 @@ class GeminiError extends Error {
   }
 }
 
-let _client = null
-function getClient() {
+export async function callGemini(prompt) {
   if (!API_KEY) {
     throw new GeminiError('Missing VITE_GEMINI_API_KEY. Add it to your .env file.', 401)
   }
-  if (!_client) _client = new GoogleGenerativeAI(API_KEY)
-  return _client
-}
-
-async function generate(systemPrompt, userPrompt, { temperature = 0.5, json = false } = {}) {
-  const client = getClient()
-  const model = client.getGenerativeModel({
-    model: MODEL_NAME,
-    systemInstruction: systemPrompt,
-    generationConfig: {
-      temperature,
-      topP: 0.95,
-      topK: 40,
-      maxOutputTokens: 8192,
-      ...(json ? { responseMimeType: 'application/json' } : {}),
-    },
-  })
-
-  let result
-  try {
-    result = await model.generateContent(userPrompt)
-  } catch (e) {
-    const msg = e?.message || String(e)
-    if (msg.includes('API_KEY') || msg.includes('permission')) {
-      throw new GeminiError('Invalid or unauthorized Gemini API key.', 401)
-    }
-    throw new GeminiError(`Gemini request failed: ${msg}`, 500)
+  if (!prompt || typeof prompt !== 'string') {
+    throw new GeminiError('Prompt is required.', 400)
   }
 
-  const text = result?.response?.text?.()
-  if (!text) throw new GeminiError('Empty response from Gemini.', 502)
-  return text
+  const url = `${API_URL}?key=${encodeURIComponent(API_KEY)}`
+  const body = {
+    model: MODEL_NAME,
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { temperature: 0.5, topP: 0.95, topK: 40, maxOutputTokens: 8192 },
+  }
+
+  let res
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  } catch (e) {
+    throw new GeminiError(`Network error contacting Gemini: ${e?.message || e}`, 502)
+  }
+
+  if (!res.ok) {
+    let detail = ''
+    try {
+      const errJson = await res.json()
+      detail = errJson?.error?.message || ''
+    } catch { /* ignore */ }
+    if (res.status === 401 || res.status === 403) {
+      throw new GeminiError('Invalid or unauthorized Gemini API key.', res.status)
+    }
+    throw new GeminiError(
+      `Gemini request failed (${res.status}): ${detail || res.statusText}`,
+      res.status
+    )
+  }
+
+  let data
+  try {
+    data = await res.json()
+  } catch (e) {
+    throw new GeminiError('Gemini returned a non-JSON response.', 502)
+  }
+
+  const answer = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join('') ?? ''
+  if (!answer) {
+    throw new GeminiError('Empty response from Gemini.', 502)
+  }
+  return answer
 }
 
 function extractJson(raw) {
@@ -104,7 +120,7 @@ Rules:
 - Output ONLY the JSON object. No prose, no \`\`\`json fences.`
 
   const userPrompt = `Topic: ${topic}\nDifficulty: ${difficulty}\nGenerate the complete study material as JSON.`
-  const raw = await generate(systemPrompt, userPrompt, { temperature: 0.5, json: true })
+  const raw = await callGemini(`${systemPrompt}\n\n${userPrompt}`)
   return validateStudy(extractJson(raw))
 }
 
@@ -117,5 +133,5 @@ export async function translateContent(text, target) {
   if (!targetDesc) throw new Error('Unknown translation target.')
   const systemPrompt = `You are a precise translator. Translate the user's text into the requested target language/variant. Return ONLY the translated text. Preserve markdown formatting, code blocks, lists, and tables exactly. Do not add notes or preamble.`
   const userPrompt = `Translate the following text into ${targetDesc}. Return ONLY the translation.\n\nTEXT:\n${text}`
-  return await generate(systemPrompt, userPrompt, { temperature: 0.2 })
+  return await callGemini(`${systemPrompt}\n\n${userPrompt}`)
 }
